@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+      http://www.kde.org/standards/kcfg/1.0/kcfg.xsd" >
+  <kcfgfile name=""/>
+  <group name="Settings">
+    <entry name="api" type="String">
+        <default></default>
+    </entry>
+    <entry name="autoplay" type="Bool">
+        <default>false</default>
+    </entry>
+    <entry name="pinned" type="Bool">
+        <default>false</default>
+    </entry>
+    <entry name="playNext" type="Bool">
+        <default>false</default>
+    </entry>    
+    <entry name="numberOfVideos" type="String">
+        <default>3</default>
+    </entry>    
+    <entry name="windowSize" type="String">
+        <default>3</default>
+    </entry>    
+    <entry name="baseUrl" type="String">
+        <default>https://www.googleapis.com/youtube/v3</default>
+    </entry>    
+  </group>
+  <group name="Youtube auth">
+    <entry name="client_id" type="string">
+      <default>765338925203-93gd0chkjsicbmelerls6j9348qsquch.apps.googleusercontent.com</default>
+    </entry>
+    <entry name="client_secret" type="string">
+      <default>O4q_OS8Kxoi1UwwEXdqF33k_</default>
+    </entry>
+    <entry name="access_token" type="String">
+        <default></default>
+    </entry>
+    <entry name="access_token_type" type="String">
+        <default></default>
+    </entry>
+    <entry name="access_token_expires_at" type="String">
+        <default></default>
+    </entry>
+    <entry name="refresh_token" type="String">
+        <default></default>
+    </entry> 
+    <entry name="device_code" type="String">
+        <default></default>
+    </entry> 
+  </group>
+  <group name="Youtube channels">
+    <entry name="channels_list" type="string">
+      <default></default>
+      </entry>
+  </group>  
+</kcfg>
