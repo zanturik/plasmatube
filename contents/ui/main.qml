@@ -26,6 +26,10 @@ Item {
         property int ended: 3
     }
 
+    Content.DB {
+        id: database
+    }
+
     QtObject {
         id: currentVideo
         property string vId: "rWiZJK4K-ms"
@@ -94,12 +98,12 @@ Item {
                 searchBinding.when = false
 		        switch(type) {
                     case "youtube#playlist":
-                        videoModel.playlistId = id			  
+                        videoModel.playlistId = videoId
                         presetsBinding.when = false   
                         playlistBinding.when = true			  
                         break;
                     case "youtube#channel":
-                        videoModel.userName = id
+                        videoModel.userName = videoId
                         playlistBinding.when = false
                         presetsBinding.when = true   
                         break;					
@@ -294,7 +298,7 @@ Item {
                         width: parent.width
                         opacity: 1
                         text: i18n('Add to preset')
-                        onClicked: Ajax.addChannel(videoModel.get(index),switcherModel.activityIdForRow(0)) //FIXME: dirty hack, but plasmoid.currentActivity doesn`t give ID if plasmoid is docked in panel
+                        onClicked: database.addVideo(videoModel.get(index),null)
                         }	
             
                     PlasmaComponents.Button {
@@ -468,7 +472,6 @@ Item {
             state: panel.state
 
             onClicked: {
-	      
                 if (panel.state == "search") {
                     panel.state = "list"
                 } else {

@@ -7,12 +7,15 @@ import "./../ajax.js" as Ajax
 
 Rectangle {
     id: container
-    signal presetClicked(string id, string type)
+    signal presetClicked(string videoId, string type)
     property var  switcherModel: ActivitySwitcher.Backend.runningActivitiesModel()   
     color: theme.backgroundColor
 
 
-  
+    DB {
+        id: database
+    }
+
     QtLayouts.RowLayout {
     anchors.fill: parent
     
@@ -31,14 +34,14 @@ Rectangle {
                     width: 200
                     iconSource: 'document-open-folder'
                     text: title
-                    onClicked: { refreshChannelsList(title, false); }
+                    onClicked: { refreshChannelsList(id); }
                 }
             }
             header: Component {
                 PlasmaComponents.Button {
                     id: homeFolderButton
                     iconSource: 'go-home'
-                    onClicked: { refreshChannelsList(null, false); }
+                    onClicked: { refreshChannelsList(null); }
                }   
             }            
             
@@ -66,11 +69,12 @@ Rectangle {
                         text: ""
                         Keys.onPressed: {
                             if (event.key == Qt.Key_Return || event.key == Qt.Key_Enter) {
-                                Ajax.addFolder(newFolderInput.text,switcherModel.activityIdForRow(0))
+                                database.addFolder(newFolderInput.text)
+                                refreshFolders();
                                 newFolder.visible = false
                                 newFolderButton.visible = true
                                 newFolderInput.text = ''                                
-                                refreshChannelsList(null,true)
+                                refreshChannelsList(null)
                             }
                             
                             if(event.key == Qt.Key_Escape) {
@@ -106,7 +110,7 @@ Rectangle {
                     width: 200
                     height: 25
                     text: title
-                    onClicked: presetClicked(id,type)
+                    onClicked: presetClicked(videoId,type)
                 }
             }
             
@@ -123,30 +127,31 @@ Rectangle {
     }
 
 
+    function refreshFolders() {
+        folderModel.clear();
+        var folders = database.getFolders();
+        for (var i = 0; i < folders.rows.length; i++) {
+            folderModel.append({"title": folders.rows.item(i).name, "id": folders.rows.item(i).id });
+        }
+    }
 
-    function refreshChannelsList(folder, initial) {
-        var activityId = switcherModel.activityIdForRow(0); //FIXME: dirty hack, but plasmoid.currentActivity doesn`t give ID if plasmoid is docked in panel
+
+    function refreshChannelsList(folderId) {
         channelModel.clear();
-                
-        if(initial) {
-            folderModel.clear();
+        var videos = database.getVideos(folderId);
+        for (var i = 0; i < videos.rows.length; i++) {
+            channelModel.append({
+                "title": videos.rows.item(i).title,
+                "type": videos.rows.item(i).type,
+                "thumbnail": videos.rows.item(i).thumbnail,
+                "totalcount": videos.rows.item(i).totalcount,
+                "lastupdated": videos.rows.item(i).lastupdated,
+                "rating": videos.rows.item(i).rating,
+                "id": videos.rows.item(i).id,
+                "videoId": videos.rows.item(i).videoid
+                 });
         }
-        var channels = plasmoid.configuration.channels_list ? JSON.parse(Qt.atob(plasmoid.configuration.channels_list)) : new Object();
-
-        if (!(activityId in channels)) {
-            channels[activityId]=[];	  
-        }
-
-        for(var i=0, len = channels[activityId].length; i<len; i++) {
-            if(!channels[activityId][i]) { continue; }
-            if(!channels[activityId][i]["folder"] && ((!channels[activityId][i]["parentFolder"] && !folder) || (channels[activityId][i]["parentFolder"] !== undefined && channels[activityId][i]["parentFolder"] == folder))) {
-                channelModel.append({"title": channels[activityId][i]["title"], "id": channels[activityId][i]["id"],"type": channels[activityId][i]["type"], "thumbnail": channels[activityId][i]["thumbnail"] });	    
-            }
-            if(channels[activityId][i]["folder"] && initial) {
-                folderModel.append({"title": channels[activityId][i]["title"] });	    
-            }            
-        }
-    } 
+    }
     
     ListModel {
         id: channelModel
@@ -156,7 +161,8 @@ Rectangle {
         id: folderModel
     }
     Component.onCompleted: {
-      refreshChannelsList(null, true);
+      refreshFolders();
+      refreshChannelsList(null);
     }    
     
 }

@@ -107,59 +107,7 @@ function post(opt, callback) {
       
     }
 
-    function deleteFolder(title, channelModel,folderModel,activityId) {
-        for (var i = 0, len = channelModel.count; i < len; i++) {
-		  if(channelModel.get(i) && !channelModel.get(i).folder && ((!channelModel.get(i).parentFolder && !title) || (channelModel.get(i).parentFolder !== undefined && channelModel.get(i).parentFolder == title)))
-          {
-              channelModel.remove(i);
-          }
-            
-		}
-        for (var j = 0, len = folderModel.count; j < len; j++) {
-            if(folderModel.get(j) && folderModel.get(j).title && folderModel.get(j).title == title) {
-            folderModel.remove(j);
-            }
-        }
-        return(saveChannelsList(channelModel,folderModel,activityId));
-    }
-    
-    
-    function saveChannelsList(model,folders,activityId) {
-		var channels = plasmoid.configuration.channels_list ? JSON.parse(Qt.atob(plasmoid.configuration.channels_list)) : new Object();
-        var activityChannels = new Array();
-        for (var i = 0, len = model.count; i < len; i++) {
-		  var video = model.get(i);
-          activityChannels[i] = {"title": video.title,"id": video.id,"thumbnail": video.thumbnail,"total": video.total,"type": video.type, "parentFolder": video.parentFolder };
-		}
-        var counter = i + 1;
-        for (var j = 0, len = folders.count; j < len; j++) {
-            if(folders.get(j).title) {
-                activityChannels[counter] = ({"title": folders.get(j).title, "folder": true });
-                counter++;
-            }
-        }
-		channels[activityId] = activityChannels; 
-		return(Qt.btoa(JSON.stringify(channels)));
-    }    
-        
-    function addFolder(name,activityId) {
-		var channels = plasmoid.configuration.channels_list ? JSON.parse(Qt.atob(plasmoid.configuration.channels_list)) : new Object();
-		if (!(activityId in channels)) {
-		  channels[activityId]=[];	  
-		}
-		var activityChannels = channels[activityId];
-        for(var i=0, len = activityChannels.length; i<len; i++) {
-           if(!activityChannels[i]) { continue; }
-           if(activityChannels[i]["folder"] && activityChannels[i]["title"] == name) {
-                    return;
-           }
-            
-        }
-		activityChannels.push({"title": name,"folder": true });
-		channels[activityId] = activityChannels; 
-		plasmoid.configuration.channels_list = Qt.btoa(JSON.stringify(channels));         
-    }
-        
+
     function getFolderIndexByName(folderModel, title) {
         for (var i = 0, len = folderModel.count; i < len; i++) {
             if(folderModel.get(i).title == title) {
@@ -169,18 +117,5 @@ function post(opt, callback) {
 		return(null);
     }
         
-    function addChannel(video,activityId)
-    {
-		var channels = plasmoid.configuration.channels_list ? JSON.parse(Qt.atob(plasmoid.configuration.channels_list)) : new Object();
 
-		if (!(activityId in channels)) {
-		  channels[activityId]=[];	  
-		}
-		var activityChannels = channels[activityId];
-		var total = countChannelVideos(video.id,video.type);
-		activityChannels.push({"title": video.title,"id": video.id,"thumbnail": video.thumbnail,"total": total,"type": video.type });
-		channels[activityId] = activityChannels; 
-		plasmoid.configuration.channels_list = Qt.btoa(JSON.stringify(channels));      
-    }
-    
     

@@ -12,7 +12,7 @@ Item {
           Column {  
             QtLayouts.RowLayout {
                 QtControls.Label {
-                    text: i18n("Version: 2.8.2")
+                    text: i18n("Version: 3.0.0")
                 }
             }
           }

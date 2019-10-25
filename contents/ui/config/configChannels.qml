@@ -5,6 +5,7 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 import org.kde.plasma.components 2.0 as PlasmaComponents
 import QtQml.Models 2.1
 import "../ajax.js" as Ajax
+import "../content" as Content
 import org.kde.plasma.activityswitcher 1.0 as ActivitySwitcher
 Rectangle {
     id: root
@@ -14,6 +15,9 @@ Rectangle {
     
     width: 300; 
 
+    Content.DB {
+        id: database
+    }
 
     Component {
         id: dragDelegate
@@ -72,17 +76,17 @@ Rectangle {
                         Column {
                             anchors.left: imageChoosen.right
                             anchors.leftMargin: 25
-                            Text { text: i18n('Name:  ') + title }
+                            Text { text: i18n('Name:  ') + folder + title }
                             Text { text: i18n((type==="youtube#channel")?"Type: channel":"Type: playlist") }
-                            Text { text: i18n('Videos:  ') + total }
+                            Text { text: i18n('Videos:  ') + bumbum  + totalcount }
                             QtControls.ComboBox {
                                 width: 150
                                 activeFocusOnPress: true
-                                currentIndex: Ajax.getFolderIndexByName(folderModel, parentFolder) 
+                                currentIndex: Ajax.getFolderIndexByName(folderModel, folder)
                                 visible: folderModel.count
 
                                 model: folderModel
-                                onCurrentIndexChanged: setFolder(folderModel.get(currentIndex).title, index)
+//                                onCurrentIndexChanged: setFolder(folderModel.get(currentIndex).title, index)
                             }
                         }
                             QtControls.Button {
@@ -90,7 +94,7 @@ Rectangle {
                                 anchors.right: parent.right
                                 anchors.rightMargin: 15
                                 text: i18n((type==="youtube#channel")?"Remove channel":"Remove playlist")
-                                onClicked: channelModel.removeItem(index)
+                                onClicked: console.log(folder);
                             }
 
                     }
@@ -126,7 +130,7 @@ Rectangle {
                     
                     Text {
                         anchors.left: parent.left
-                        text: title 
+                        text: title
                     }
                 }
                 QtControls.Button {
@@ -134,8 +138,8 @@ Rectangle {
                     width: 200
                     height: 25
                     text: 'Show'
-                    visible: false
-                    onClicked: refreshChannelsList(title,false)
+                    visible: true
+                    onClicked: refreshChannelsList(id)
                 }                
          
                 QtControls.Button {
@@ -144,7 +148,7 @@ Rectangle {
                     width: 200
                     height: 25
                     text: 'Delete'
-                    onClicked: cfg_channels_list = Ajax.deleteFolder(title, channelModel,folderModel,switcherModel.activityIdForRow(0))
+                    onClicked: { database.deleteFolderByName(title); refreshFolders(); refreshChannelsList(null); }
                 }
      }
     }
@@ -203,33 +207,65 @@ Rectangle {
         } 
       }
     
-        
-    function refreshChannelsList(folder, initial) {
-        var activityId = switcherModel.activityIdForRow(0); //FIXME: dirty hack, but plasmoid.currentActivity doesn`t give ID if plasmoid is docked in panel
+
+
+    function refreshFolders() {
+        folderModel.clear();
+        folderModel.append({"text":"","title": "","id": null });
+        var folders = database.getFolders();
+        for (var i = 0; i < folders.rows.length; i++) {
+            folderModel.append({"text": folders.rows.item(i).name, "title": folders.rows.item(i).name, "id": folders.rows.item(i).id});
+        }
+    }
+
+
+    function refreshChannelsList(folderId) {
         channelModel.clear();
-                
-        if(initial) {
-            folderModel.clear();
-            folderModel.append({"title":"" });
+        var folderName = database.getFolderName(folderId)
+        var videos = database.getVideos(folderId);
+        for (var i = 0; i < videos.rows.length; i++) {
+        console.log(folderName);
+            channelModel.append({
+                "title": videos.rows.item(i).title,
+                "type": videos.rows.item(i).type,
+                "thumbnail": videos.rows.item(i).thumbnail,
+                "totalcount": videos.rows.item(i).totalcount,
+                "lastupdated": videos.rows.item(i).lastupdated,
+                "rating": videos.rows.item(i).rating,
+                "id": videos.rows.item(i).id,
+                "videoId": videos.rows.item(i).videoid,
+                "folder": String(folderName),
+                "bumbum": "" + folderName
+                 });
         }
-        var channels = plasmoid.configuration.channels_list ? JSON.parse(Qt.atob(plasmoid.configuration.channels_list)) : new Object();
+    }
 
-        if (!(activityId in channels)) {
-            channels[activityId]=[];	  
-        }
-
-        for(var i=0, len = channels[activityId].length; i<len; i++) {
-            if(!channels[activityId][i]) { continue; }
-            if(!channels[activityId][i]["folder"] )
-//                && ((!channels[activityId][i]["parentFolder"] && !folder) || (channels[activityId][i]["parentFolder"] !== undefined && channels[activityId][i]["parentFolder"] == folder)))
-             {
-                channelModel.append({"title": channels[activityId][i]["title"], "id": channels[activityId][i]["id"],"type": channels[activityId][i]["type"], "thumbnail": channels[activityId][i]["thumbnail"], "total": channels[activityId][i]["total"], "parentFolder": channels[activityId][i]["parentFolder"] });	    
-            }
-            if(channels[activityId][i]["folder"] && initial) {
-                folderModel.append({"title": channels[activityId][i]["title"] });	    
-            }            
-        }
-    }    
+//    function refreshChannelsList(folder, initial) {
+//        var activityId = switcherModel.activityIdForRow(0); //FIXME: dirty hack, but plasmoid.currentActivity doesn`t give ID if plasmoid is docked in panel
+//        channelModel.clear();
+//
+//        if(initial) {
+//            folderModel.clear();
+//            folderModel.append({"title":"" });
+//        }
+//        var channels = plasmoid.configuration.channels_list ? JSON.parse(Qt.atob(plasmoid.configuration.channels_list)) : new Object();
+//
+//        if (!(activityId in channels)) {
+//            channels[activityId]=[];
+//        }
+//
+//        for(var i=0, len = channels[activityId].length; i<len; i++) {
+//            if(!channels[activityId][i]) { continue; }
+//            if(!channels[activityId][i]["folder"] )
+////                && ((!channels[activityId][i]["parentFolder"] && !folder) || (channels[activityId][i]["parentFolder"] !== undefined && channels[activityId][i]["parentFolder"] == folder)))
+//             {
+//                channelModel.append({"title": channels[activityId][i]["title"], "id": channels[activityId][i]["id"],"type": channels[activityId][i]["type"], "thumbnail": channels[activityId][i]["thumbnail"], "total": channels[activityId][i]["total"], "parentFolder": channels[activityId][i]["parentFolder"] });
+//            }
+//            if(channels[activityId][i]["folder"] && initial) {
+//                folderModel.append({"title": channels[activityId][i]["title"] });
+//            }
+//        }
+//    }
     
     function setFolder(title,id) {
        if ((!channelModel.get(id).parentFolder && !title) || (channelModel.get(id).parentFolder !== undefined && channelModel.get(id).parentFolder == title))
@@ -244,6 +280,7 @@ Rectangle {
 
 
     Component.onCompleted: {
-      refreshChannelsList(null, true);
+      refreshFolders();
+      refreshChannelsList(null);
     }        
 }
