@@ -7,7 +7,7 @@ import "./../ajax.js" as Ajax
 
 Rectangle {
     id: container
-    signal presetClicked(string videoId, string type)
+    signal presetClicked(string videoId, string type, string title)
     color: theme.backgroundColor
 
 
@@ -107,7 +107,7 @@ Rectangle {
                     width: 200
                     height: 25
                     text: title
-                    onClicked: presetClicked(videoId,type)
+                    onClicked: presetClicked(videoId,type, title)
                 }
             }
             

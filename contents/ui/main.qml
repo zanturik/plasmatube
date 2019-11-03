@@ -104,8 +104,12 @@ Item {
                         videoModel.userName = videoId
                         playlistBinding.when = false
                         presetsBinding.when = true   
-                        break;					
-                    }                
+                        break;
+                    case "youtube#video":
+                        currentVideo.autoplay = plasmoid.configuration.autoplay
+                        currentVideo.vId = videoId
+                        currentVideo.title = title
+                    }
                videoModel.reload(true)
             }
         }
@@ -227,7 +231,7 @@ Item {
                             PropertyChanges { target: infoBackground; visible: false }
                             PropertyChanges { target: infoLabel; 	  visible: false }                
                             PropertyChanges { target: removeButton; visible: true }                       
-                            PropertyChanges { target: addPresetButton; visible: (type === "youtube#channel" || type === "youtube#playlist")?true:false }                  
+                            PropertyChanges { target: addPresetButton; visible: true }
                         }]     
                     Timer {
                         id: hidePictureTimer
