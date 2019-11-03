@@ -92,7 +92,7 @@ Rectangle {
                                 width: 150
                                 QtLayouts.Layout.alignment: Qt.AlignRight;
                                 QtLayouts.Layout.rightMargin: 15
-                                text: i18n((type==="youtube#channel")?"Remove channel":"Remove playlist")
+                                text: i18n("Remove")
                                 onClicked: removeVideo(id, folderId);
                         }
 
@@ -214,9 +214,6 @@ Rectangle {
 
 
     function refreshChannelsList(folderId) {
-        if(folderId == 0 ) {
-            folderId = null;
-        }
         channelModel.clear();
         var folderName = database.getFolderName(folderId)
         var videos = database.getVideos(folderId);
@@ -231,7 +228,7 @@ Rectangle {
                 "id": videos.rows.item(i).id,
                 "videoId": videos.rows.item(i).videoid,
                 "folder": String(folderName),
-                "folderId": videos.rows.item(i).folderid
+                "folderId": (folderId == null) ? 0 : folderId
                  });
         }
     }

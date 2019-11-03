@@ -30,10 +30,10 @@ Item {
 
     QtObject {
         id: currentVideo
-        property string vId: "rWiZJK4K-ms"
+        property string vId: database.getRandomVideoId()
         property string title: (plasmoid.configuration.access_token=='')?"You need to connect to your google account!":''
         property int status: videoStatus.initial
-        property bool autoplay: true
+        property bool autoplay: false
     }
 
     readonly property int padding: 20

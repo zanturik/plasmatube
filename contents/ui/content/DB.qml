@@ -78,7 +78,7 @@ Item {
     }
 
     function getFolderName(folderId) {
-        if(folderId == null) {
+        if(folderId == null || folderId == 0) {
             return null;
         }
         var folderName;
@@ -110,7 +110,7 @@ Item {
             var videos;
             root.db.transaction(
                function(tx) {
-                if (folderId == null){
+                if (folderId == null || folderId == 0){
                     videos = tx.executeSql('SELECT * FROM videos WHERE folderid IS NULL ORDER BY sort ASC');
                 } else {
                     videos = tx.executeSql('SELECT * FROM videos WHERE folderid = ? ORDER BY sort ASC', [ folderId ]);
@@ -153,6 +153,21 @@ Item {
                     tx.executeSql('UPDATE videos SET sort = ? WHERE id = ?', [ sortValue, videoId ]);
                }
             )
+    }
+
+    function getRandomVideoId() {
+                var videos;
+                var videoId = "rWiZJK4K-ms";
+                root.db.transaction(
+                    function(tx) {
+                       videos = tx.executeSql('SELECT * FROM videos WHERE type = "youtube#video" ORDER BY RANDOM() LIMIT 1;');
+                    }
+                )
+                if(videos.rows.length != 0 ) {
+                  videoId = videos.rows.item(0).videoid;
+
+                }
+                return videoId;
     }
 
 }
