@@ -8,10 +8,8 @@ import org.kde.plasma.plasmoid 2.0
 import "content" as Content
 import "ajax.js" as Ajax
 import org.kde.draganddrop 2.0 as DragDrop
-import org.kde.plasma.activityswitcher 1.0 as ActivitySwitcher
 Item {
     id: container
-    property var switcherModel: ActivitySwitcher.Backend.runningActivitiesModel()     
     property string hoveredTitle
     width: units.gridUnit * 16 * plasmoid.configuration.windowSize
     height: units.gridUnit * 9 * plasmoid.configuration.windowSize

@@ -8,7 +8,6 @@ import "./../ajax.js" as Ajax
 Rectangle {
     id: container
     signal presetClicked(string videoId, string type)
-    property var  switcherModel: ActivitySwitcher.Backend.runningActivitiesModel()   
     color: theme.backgroundColor
 
 
@@ -22,10 +21,9 @@ Rectangle {
         ListView {
             id: folderView
             focus: true
-            anchors.top: parent.top
-            anchors.topMargin: 10
-            anchors.bottom: parent.bottom
             QtLayouts.Layout.alignment: Qt.AlignHCenter
+            QtLayouts.Layout.fillHeight: true
+            QtLayouts.Layout.topMargin: 10;
             width: 200
             model: folderModel
             boundsBehavior: Flickable.DragAndOvershootBounds         
@@ -98,10 +96,9 @@ Rectangle {
 
         ListView {
             id: view
-            anchors.top: parent.top
-            anchors.topMargin: 10            
-            anchors.bottom: parent.bottom
             QtLayouts.Layout.alignment: Qt.AlignHCenter
+            QtLayouts.Layout.fillHeight: true
+            QtLayouts.Layout.topMargin: 10
             width: 200
             model: channelModel
             boundsBehavior: Flickable.DragAndOvershootBounds         
