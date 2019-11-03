@@ -1,6 +1,6 @@
 import QtQuick.LocalStorage 2.0
 import QtQuick 2.0
-
+import QtQml 2.0
 
 Item {
     id: root
@@ -14,8 +14,8 @@ Item {
     function init() {
             root.db.transaction(
                 function(tx) {
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS folders([id] INTEGER PRIMARY KEY, [name] Text, [sort] Integer)');
-                    tx.executeSql('CREATE TABLE IF NOT EXISTS videos([id] INTEGER PRIMARY KEY, [title] Text, [thumbnail] Text, [type] Text, [videoid] Text, [totalcount] Integer, [lastupdated] Date, [rating] Integer, [folderid] Integer, FOREIGN KEY(folderid) REFERENCES folders(id))');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS folders([id] INTEGER PRIMARY KEY, [name] TEXT, [sort] INTEGER)');
+                    tx.executeSql('CREATE TABLE IF NOT EXISTS videos([id] INTEGER PRIMARY KEY, [title] TEXT, [thumbnail] TEXT, [type] TEXT, [videoid] TEXT, [totalcount] INTEGER, [lastupdated] DATE, [rating] INTEGER, [folderid] INTEGER, [sort] INTEGER, FOREIGN KEY(folderid) REFERENCES folders(id))');
                 }
             )
         }
@@ -65,6 +65,18 @@ Item {
             )
     }
 
+    function setFolder(folderId, videoId) {
+            root.db.transaction(
+               function(tx) {
+                if (folderId == null || folderId == 0){
+                    tx.executeSql('UPDATE videos SET folderid = NULL WHERE id = ?', [ videoId ]);
+                } else {
+                    tx.executeSql('UPDATE videos SET folderid = ? WHERE id = ?', [ folderId, videoId ]);
+                }
+               }
+            )
+    }
+
     function getFolderName(folderId) {
         if(folderId == null) {
             return null;
@@ -88,7 +100,7 @@ Item {
             var folders;
             root.db.transaction(
                 function(tx) {
-                    folders = tx.executeSql('SELECT id, name FROM folders');
+                    folders = tx.executeSql('SELECT id, name FROM folders ORDER BY sort ASC');
                 }
             )
             return folders;
@@ -99,9 +111,9 @@ Item {
             root.db.transaction(
                function(tx) {
                 if (folderId == null){
-                    videos = tx.executeSql('SELECT * FROM videos WHERE folderid IS NULL');
+                    videos = tx.executeSql('SELECT * FROM videos WHERE folderid IS NULL ORDER BY sort ASC');
                 } else {
-                    videos = tx.executeSql('SELECT * FROM videos WHERE folderid = ?', [ folderId ]);
+                    videos = tx.executeSql('SELECT * FROM videos WHERE folderid = ? ORDER BY sort ASC', [ folderId ]);
                 }
                }
             )
@@ -111,9 +123,35 @@ Item {
     function addVideo(video, folderId) {
             root.db.transaction(
                 function(tx) {
-                    tx.executeSql('INSERT INTO videos (title, thumbnail, type, videoId, totalcount, lastupdated, rating, folderId)  VALUES(?,?,?,?,?,?,?,?)',
-                     [ video.title, video.thumbnail, video.type, video.id, 0, '2019-01-01', 0, folderId ]);
+                   if (folderId == null || folderId == 0) {
+                   var rs = tx.executeSql('SELECT MAX(sort) as maxsort FROM videos WHERE folderId IS NULL');
+                   } else
+                   {
+                   var rs = tx.executeSql('SELECT MAX(sort) as maxsort FROM videos WHERE folderId = ?', [ folderId ]);
+                   }
+                   var sortValue = rs.rows.item(0).maxsort + 1;
+
+                var currentDate = new Date();
+                     tx.executeSql('INSERT INTO videos (title, thumbnail, type, videoId, totalcount, lastupdated, rating, folderId, sort)  VALUES(?,?,?,?,?,?,?,?,?)',
+                     [ video.title, video.thumbnail, video.type, video.id, 0, currentDate, 0, folderId, sortValue ]);
+
                 }
+            )
+    }
+
+    function deleteVideo(videoId) {
+            root.db.transaction(
+                function(tx) {
+                    tx.executeSql('DELETE FROM videos WHERE id = ?', [ videoId ]);
+                }
+            )
+    }
+
+    function setSortVideo(videoId, sortValue) {
+            root.db.transaction(
+               function(tx) {
+                    tx.executeSql('UPDATE videos SET sort = ? WHERE id = ?', [ sortValue, videoId ]);
+               }
             )
     }
 
