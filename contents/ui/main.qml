@@ -1,5 +1,5 @@
 import QtQuick 2.0
-import QtWebKit 3.0
+import QtWebView 1.1
 import QtQuick.Controls 1.1 as QtControls
 import QtQuick.Controls.Styles 1.1
 import org.kde.plasma.core 2.0 as PlasmaCore
@@ -30,10 +30,9 @@ Item {
 
     QtObject {
         id: currentVideo
-        property string vId: database.getRandomVideoId()
+        property string vId: ''
         property string title: (plasmoid.configuration.access_token=='')?"You need to connect to your google account!":''
         property int status: videoStatus.initial
-        property bool autoplay: false
     }
 
     readonly property int padding: 20
@@ -48,7 +47,7 @@ Item {
             anchors.fill: parent
             opacity: 0
 
-            url: "content/player.html?id=" + currentVideo.vId + "&autoplay=" + currentVideo.autoplay
+            url: ""
 	    
             Behavior on opacity { NumberAnimation { duration: 200 } }
 
@@ -106,9 +105,9 @@ Item {
                         presetsBinding.when = true   
                         break;
                     case "youtube#video":
-                        currentVideo.autoplay = plasmoid.configuration.autoplay
                         currentVideo.vId = videoId
                         currentVideo.title = title
+                        videoModel.playVideo(videoId);
                     }
                videoModel.reload(true)
             }
@@ -246,12 +245,12 @@ Item {
                         onEntered: mouseEnteredProcess()
                         onExited: mouseExitedProcess()
                         onClicked: {
-                            if (mouse.button == Qt.LeftButton) {			  
+                            if (mouse.button == Qt.LeftButton) {
                             switch(type) {
                                 case "youtube#video":
-                                    currentVideo.autoplay = plasmoid.configuration.autoplay
                                     currentVideo.vId = id
                                     currentVideo.title = title
+                                    videoModel.playVideo(id);
                                 break
                                 case "youtube#playlist":
                                     videoModel.playlistId = id
@@ -668,6 +667,11 @@ Item {
                 startIndex -= itemsPerPage
             reload(true)
         }
+
+        function playVideo(videoId) {
+            webView.runJavaScript('playVideo("' + videoId + '");');
+        }
+
         
         function playNextVideo() {
             if(videoModel.count <= 1) { 
@@ -676,9 +680,10 @@ Item {
             }
             for(var i=0, len = videoModel.count; i < len; i++) {
                 if(videoModel.get(i).id == currentVideo.vId && i != (len-1)) {
-                    currentVideo.autoplay = true;
+                    webView.runJavaScript('cueVideo("' + videoModel.get(i + 1).id + '");');
                     currentVideo.vId = videoModel.get(i + 1).id;
-                    currentVideo.title = videoModel.get(i + 1).title;                    
+                    currentVideo.title = videoModel.get(i + 1).title;
+                    webView.runJavaScript('nextVideo();');
                     if(videoModel.get(i + 1).type != "youtube#video") {
                         videoModel.playNextVideo();
                     }
@@ -745,6 +750,7 @@ Item {
       Ajax.checkIsTokenExpired();
       }
       plasmoid.hideOnWindowDeactivate = !plasmoid.configuration.pinned;
+      webView.url = "content/player.html?id=" + database.getRandomVideoId() + "&autoplay=" + plasmoid.configuration.autoplay
     }
     
 }
