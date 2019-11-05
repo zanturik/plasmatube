@@ -40,19 +40,28 @@ Item {
         Column {
             visible: !cfg_access_token
 	     QtControls.Label {
-                text: i18n("Please, enter the following code at the <a href=\"https://www.google.com/device\">Authorization page</a>.")
-		onLinkActivated: Qt.openUrlExternally(link)	
-		MouseArea {
-		  anchors.fill: parent
-		  acceptedButtons: Qt.NoButton  
-		  cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
-		}		
+                text: i18n("Please, enter the following code at the:")
+		
             }
+            QtControls.TextField {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                text: "https://www.google.com/device"
+                maximumLength: 64
+                readOnly: true
+                onFocusChanged: { if(activeFocus) { selectAll() }  } 
+                style: TextFieldStyle {
+                    textColor: "#111"
+                    background: Rectangle {
+                        color: "#eee"
+                    }
+		}
+            }            
             QtControls.TextField {
                 id: userCodeInput
                 placeholderText: i18n("Please, wait...")
                 readOnly: true
-                onFocusChanged: selectAll()
+                onFocusChanged: { if(activeFocus) { selectAll() }  } 
                 style: TextFieldStyle {
                     textColor: "#111"
                     background: Rectangle {
