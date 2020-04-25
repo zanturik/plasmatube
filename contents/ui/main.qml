@@ -86,8 +86,6 @@ Item {
                 var videoId = dropArea.getYoutubeId(request.requestedUrl.toString());
                 if(videoId) {
                 videoModel.addVideo(videoId);
-                currentVideo.vId = videoId;
-            //    videoModel.playVideo(videoId);
                 }
             }
         }
