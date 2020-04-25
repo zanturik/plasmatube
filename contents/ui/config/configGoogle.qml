@@ -40,19 +40,28 @@ Item {
         Column {
             visible: !cfg_access_token
 	     QtControls.Label {
-                text: i18n("Please, enter the following code at the <a href=\"https://www.google.com/device\">Authorization page</a>.")
-		onLinkActivated: Qt.openUrlExternally(link)	
-		MouseArea {
-		  anchors.fill: parent
-		  acceptedButtons: Qt.NoButton  
-		  cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
-		}		
+                text: i18n("Please, enter the following code at the:")
+		
             }
+            QtControls.TextField {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                text: "https://www.google.com/device"
+                maximumLength: 64
+                readOnly: true
+                onFocusChanged: { if(activeFocus) { selectAll() }  } 
+                style: TextFieldStyle {
+                    textColor: "#111"
+                    background: Rectangle {
+                        color: "#eee"
+                    }
+		}
+            }            
             QtControls.TextField {
                 id: userCodeInput
                 placeholderText: i18n("Please, wait...")
                 readOnly: true
-                onFocusChanged: selectAll()
+                onFocusChanged: { if(activeFocus) { selectAll() }  } 
                 style: TextFieldStyle {
                     textColor: "#111"
                     background: Rectangle {
@@ -198,7 +207,7 @@ Item {
     }
     
     function pollAccessToken() {
-        var url = 'https://www.googleapis.com/oauth2/v4/token';
+        var url = 'https://oauth2.googleapis.com/token';
         Ajax.post({
             url: url,
             data: {
@@ -241,7 +250,6 @@ Item {
     function generateUserCodeAndPoll() {
         getUserCode(function(err, data) {
             data = JSON.parse(data);
-   
             device_code.text = data.device_code;
             val_user_code = data.user_code;
             val_user_code_verification_url = data.verification_url;
