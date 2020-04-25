@@ -66,7 +66,7 @@ Rectangle {
                         cursorVisible: true
                         text: ""
                         Keys.onPressed: {
-                            if (event.key == Qt.Key_Return || event.key == Qt.Key_Enter) {
+                            if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                                 database.addFolder(newFolderInput.text)
                                 refreshFolders();
                                 newFolder.visible = false
@@ -75,7 +75,7 @@ Rectangle {
                                 refreshChannelsList(null)
                             }
                             
-                            if(event.key == Qt.Key_Escape) {
+                            if(event.key === Qt.Key_Escape) {
                                 newFolder.visible = false
                                 newFolderButton.visible = true
                                 newFolderInput.text = ''

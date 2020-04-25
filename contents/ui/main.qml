@@ -1,5 +1,6 @@
+
 import QtQuick 2.0
-import QtWebView 1.1
+import QtWebEngine 1.5
 import QtQuick.Controls 1.1 as QtControls
 import QtQuick.Controls.Styles 1.1
 import org.kde.plasma.core 2.0 as PlasmaCore
@@ -31,7 +32,7 @@ Item {
     QtObject {
         id: currentVideo
         property string vId: ''
-        property string title: (plasmoid.configuration.access_token=='')?"You need to connect to your google account!":''
+        property string title: (plasmoid.configuration.access_token==='')?"You need to connect to your google account!":''
         property int status: videoStatus.initial
     }
 
@@ -42,25 +43,23 @@ Item {
         anchors.fill: parent
         color: "black"
 
-        WebView {
+        WebEngineView {
             id: webView
             anchors.fill: parent
             opacity: 0
-
-            url: ""
-	    
+            url: "content/player.html"
             Behavior on opacity { NumberAnimation { duration: 200 } }
 
             onLoadingChanged: {
                 switch (loadRequest.status)
                 {
-                case WebView.LoadSucceededStatus:
+                case WebEngineView.LoadSucceededStatus:
                     opacity = 1
                     return
-                case WebView.LoadStartedStatus:
-                case WebView.LoadStoppedStatus:
+                case WebEngineView.LoadStartedStatus:
+                case WebEngineView.LoadStoppedStatus:
                     break
-                case WebView.LoadFailedStatus:
+                case WebEngineView.LoadFailedStatus:
                     topInfo.text = "Failed to load the requested video"
                     break
                 }
@@ -68,11 +67,11 @@ Item {
             }
             onTitleChanged: {
                 currentVideo.status = 1 * title
-                if (title == videoStatus.paused || title == videoStatus.ready) {
+                if (title === videoStatus.paused || title === videoStatus.ready) {
                     panel.state = "list"
-                } else if (title == videoStatus.playing) {
+                } else if (title === videoStatus.playing) {
                     panel.state = "hidden"
-                } else if (title == videoStatus.ended ) {
+                } else if (title === videoStatus.ended ) {
                     if(plasmoid.configuration.playNext) {
                         panel.state = "hidden"
                         videoModel.playNextVideo();
@@ -80,6 +79,15 @@ Item {
                         panel.state = "list";
                     }
                     
+                }
+            }
+
+            onNewViewRequested: function(request) {
+                var videoId = dropArea.getYoutubeId(request.requestedUrl.toString());
+                if(videoId) {
+                videoModel.addVideo(videoId);
+                currentVideo.vId = videoId;
+            //    videoModel.playVideo(videoId);
                 }
             }
         }
@@ -97,19 +105,22 @@ Item {
                     case "youtube#playlist":
                         videoModel.playlistId = videoId
                         presetsBinding.when = false   
-                        playlistBinding.when = true			  
+                        playlistBinding.when = true
+                        videoModel.reload(true)
                         break;
                     case "youtube#channel":
                         videoModel.userName = videoId
                         playlistBinding.when = false
-                        presetsBinding.when = true   
+                        presetsBinding.when = true
+                        videoModel.reload(true)
                         break;
                     case "youtube#video":
                         currentVideo.vId = videoId
                         currentVideo.title = title
                         videoModel.playVideo(videoId);
+                        break;
                     }
-               videoModel.reload(true)
+
             }
         }
     }
@@ -283,7 +294,7 @@ Item {
                         }
                         function mouseExitedProcess() {
                             container.hoveredTitle = ''
-                            if(image.state = "properties") {
+                            if(image.state == "properties") {
                                 hidePictureTimer.start();
                             }
                         }
@@ -345,7 +356,7 @@ Item {
             onDraggingChanged: {
                 if (dragging)
                     hideTimer.stop()
-                else if (currentVideo.status == videoStatus.playing)
+                else if (currentVideo.status === videoStatus.playing)
                     hideTimer.start()
             }
             
@@ -410,7 +421,7 @@ Item {
                     cursorVisible: true
                     text: ""
                     Keys.onPressed: {
-                        if (event.key == Qt.Key_Return || event.key == Qt.Key_Enter) {
+                        if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                             videoModel.startIndex = 1
                             panel.state = "list"
                             presetsBinding.when = false
@@ -554,7 +565,7 @@ Item {
             onPressed: {
                 if (panel.state != "list") {
                     panel.state = "list"
-                    if (currentVideo.status == videoStatus.playing)
+                    if (currentVideo.status === videoStatus.playing)
                         hideTimer.restart()
                 } else
                     panel.state = "hidden"
@@ -626,7 +637,7 @@ Item {
             function getYoutubeId(url) {
                 var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
                 var match = url.match(regExp);
-                return (match&&match[7].length==11)? match[7] : false;                
+                return (match&&match[7].length===11)? match[7] : false;
             }
 
         }
@@ -669,6 +680,9 @@ Item {
         }
 
         function playVideo(videoId) {
+            if(currentVideo.status === videoStatus.initial) {
+                return;
+            }
             webView.runJavaScript('playVideo("' + videoId + '");');
         }
 
@@ -679,12 +693,12 @@ Item {
                 return;
             }
             for(var i=0, len = videoModel.count; i < len; i++) {
-                if(videoModel.get(i).id == currentVideo.vId && i != (len-1)) {
+                if(videoModel.get(i).id === currentVideo.vId && i != (len-1)) {
                     webView.runJavaScript('cueVideo("' + videoModel.get(i + 1).id + '");');
                     currentVideo.vId = videoModel.get(i + 1).id;
                     currentVideo.title = videoModel.get(i + 1).title;
                     webView.runJavaScript('nextVideo();');
-                    if(videoModel.get(i + 1).type != "youtube#video") {
+                    if(videoModel.get(i + 1).type !== "youtube#video") {
                         videoModel.playNextVideo();
                     }
                     break;
@@ -698,7 +712,7 @@ Item {
         }
 
         function reload(clearModel) {
-            Ajax.checkIsTokenExpired();            
+            Ajax.checkIsTokenExpired();
             Ajax.request(source,function(err, data, xhr) {
                 if (err || (!err && data && data.error)) {
                     console.log('something went wrong:', err, data);
@@ -715,27 +729,30 @@ Item {
                     for (var i = 0, len = doc.items.length; i < len; i++) {
                         var title = doc.items[i].snippet.title;
                         var thumbnail = (doc.items[i].snippet.thumbnails === undefined)?'./icons/not-found.png':doc.items[i].snippet.thumbnails.default.url;
+                        var id;
+                        var type;
                         if (doc.items[i].kind === "youtube#searchResult" ) {
-                            var type = doc.items[i].id.kind;
+                            type = doc.items[i].id.kind;
+
                             switch(type) {
                                 case "youtube#video":
-                                    var id = doc.items[i].id.videoId;
+                                    id = doc.items[i].id.videoId;
                                     break;
                                 case "youtube#playlist":
-                                    var id = doc.items[i].id.playlistId;
+                                    id = doc.items[i].id.playlistId;
                                     break;
                                 case "youtube#channel":
-                                    var id = doc.items[i].id.channelId;
+                                    id = doc.items[i].id.channelId;
                                 break;					
                             }
                         }
                         if (doc.items[i].kind === "youtube#playlistItem") {
-                            var type = doc.items[i].snippet.resourceId.kind;
-                            var id = doc.items[i].snippet.resourceId.videoId;
+                            type = doc.items[i].snippet.resourceId.kind;
+                            id = doc.items[i].snippet.resourceId.videoId;
                         }
                         if (doc.items[i].kind === "youtube#video") {
-                            var type = doc.items[i].kind;
-                            var id = doc.items[i].id;
+                            type = doc.items[i].kind;
+                            id = doc.items[i].id;
                         }
                         
                         videoModel.append({ "title": title ,"thumbnail": thumbnail,"id": id,"type": type });
@@ -746,8 +763,8 @@ Item {
     }
     
     Component.onCompleted: {
-      if (plasmoid.configuration.access_token!='') {
-      Ajax.checkIsTokenExpired();
+      if (plasmoid.configuration.access_token!=='') {
+       Ajax.checkIsTokenExpired();
       }
       plasmoid.hideOnWindowDeactivate = !plasmoid.configuration.pinned;
       webView.url = "content/player.html?id=" + database.getRandomVideoId() + "&autoplay=" + plasmoid.configuration.autoplay

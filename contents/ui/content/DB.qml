@@ -55,7 +55,7 @@ Item {
             root.db.transaction(
                 function(tx) {
                     var folders = tx.executeSql('SELECT id FROM folders WHERE name = ?', [ name ]);
-                        if(folders.rows.length == 0 ) {
+                        if(folders.rows.length === 0 ) {
                             return;
                         }
                     for (var i = 0; i < folders.rows.length; i++) {
@@ -68,7 +68,7 @@ Item {
     function setFolder(folderId, videoId) {
             root.db.transaction(
                function(tx) {
-                if (folderId == null || folderId == 0){
+                if (folderId === null || folderId === 0){
                     tx.executeSql('UPDATE videos SET folderid = NULL WHERE id = ?', [ videoId ]);
                 } else {
                     tx.executeSql('UPDATE videos SET folderid = ? WHERE id = ?', [ folderId, videoId ]);
@@ -78,14 +78,14 @@ Item {
     }
 
     function getFolderName(folderId) {
-        if(folderId == null || folderId == 0) {
+        if(folderId === null || folderId === 0) {
             return null;
         }
         var folderName;
         root.db.transaction(
              function(tx) {
                     var folders = tx.executeSql('SELECT name FROM folders WHERE id = ?', [ folderId ]);
-                   if(folders.rows.length == 0 ) {
+                   if(folders.rows.length === 0 ) {
                         folderName = null;
                    } else {
                     folderName = folders.rows.item(0).name;
@@ -110,7 +110,7 @@ Item {
             var videos;
             root.db.transaction(
                function(tx) {
-                if (folderId == null || folderId == 0){
+                if (folderId === null || folderId === 0){
                     videos = tx.executeSql('SELECT * FROM videos WHERE folderid IS NULL ORDER BY sort ASC');
                 } else {
                     videos = tx.executeSql('SELECT * FROM videos WHERE folderid = ? ORDER BY sort ASC', [ folderId ]);
@@ -123,11 +123,12 @@ Item {
     function addVideo(video, folderId) {
             root.db.transaction(
                 function(tx) {
-                   if (folderId == null || folderId == 0) {
-                   var rs = tx.executeSql('SELECT MAX(sort) as maxsort FROM videos WHERE folderId IS NULL');
+                    var rs;
+                   if (folderId === null || folderId === 0) {
+                   rs = tx.executeSql('SELECT MAX(sort) as maxsort FROM videos WHERE folderId IS NULL');
                    } else
                    {
-                   var rs = tx.executeSql('SELECT MAX(sort) as maxsort FROM videos WHERE folderId = ?', [ folderId ]);
+                   rs = tx.executeSql('SELECT MAX(sort) as maxsort FROM videos WHERE folderId = ?', [ folderId ]);
                    }
                    var sortValue = rs.rows.item(0).maxsort + 1;
 
@@ -163,7 +164,7 @@ Item {
                        videos = tx.executeSql('SELECT * FROM videos WHERE type = "youtube#video" ORDER BY RANDOM() LIMIT 1;');
                     }
                 )
-                if(videos.rows.length != 0 ) {
+                if(videos.rows.length !== 0 ) {
                   videoId = videos.rows.item(0).videoid;
 
                 }

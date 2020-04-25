@@ -228,7 +228,7 @@ Rectangle {
                 "id": videos.rows.item(i).id,
                 "videoId": videos.rows.item(i).videoid,
                 "folder": String(folderName),
-                "folderId": (folderId == null) ? 0 : folderId
+                "folderId": (folderId === null) ? 0 : folderId
                  });
         }
     }
