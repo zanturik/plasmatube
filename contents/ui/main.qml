@@ -1,5 +1,6 @@
 
 import QtQuick 2.0
+import QtQml 2.14
 import QtWebEngine 1.5
 import QtQuick.Controls 1.1 as QtControls
 import QtQuick.Controls.Styles 1.1
@@ -67,11 +68,11 @@ Item {
             }
             onTitleChanged: {
                 currentVideo.status = 1 * title
-                if (title === videoStatus.paused || title === videoStatus.ready) {
+                if (currentVideo.status === videoStatus.paused || currentVideo.status === videoStatus.ready) {
                     panel.state = "list"
-                } else if (title === videoStatus.playing) {
+                } else if (currentVideo.status === videoStatus.playing) {
                     panel.state = "hidden"
-                } else if (title === videoStatus.ended ) {
+                } else if (currentVideo.status === videoStatus.ended ) {
                     if(plasmoid.configuration.playNext) {
                         panel.state = "hidden"
                         videoModel.playNextVideo();
@@ -133,9 +134,9 @@ Item {
         Behavior on height { NumberAnimation { duration: 200 } }
         Behavior on opacity { NumberAnimation { duration: 400 } }
 
-        Binding { id: presetsBinding; target: videoModel; property: "source"; value: videoModel.usersSource; when: true }
-        Binding { id: searchBinding; target: videoModel; property: "source"; value: videoModel.searchSource; when: false }
-        Binding { id: playlistBinding; target: videoModel; property: "source"; value: videoModel.playlistSource; when: false }        
+        Binding { id: presetsBinding; target: videoModel; property: "source"; value: videoModel.usersSource; when: true; restoreMode: Binding.RestoreBinding }
+        Binding { id: searchBinding; target: videoModel; property: "source"; value: videoModel.searchSource; when: false; restoreMode: Binding.RestoreBinding }
+        Binding { id: playlistBinding; target: videoModel; property: "source"; value: videoModel.playlistSource; when: false; restoreMode: Binding.RestoreBinding }        
 
         anchors {
             left: container.left
@@ -513,19 +514,23 @@ Item {
             Binding on text {
                 value: "Results " + videoModel.startIndex + " through " + ((videoModel.endIndex > videoModel.totalResults) ? videoModel.totalResults : videoModel.endIndex) + " out of " + videoModel.totalResults
                 when: panel.state == "list" && videoModel.count && !container.hoveredTitle.length
+                restoreMode: Binding.RestoreBinding
             }
             Binding on text {
                 value: "No results found.";
                 when: !videoModel.count && !container.hoveredTitle.length
+                restoreMode: Binding.RestoreBinding                
             }
             Binding on text {
                 value: "Search for videos"
                 when: panel.state == "search" && !container.hoveredTitle.length
+                restoreMode: Binding.RestoreBinding
             }
             
             Binding on text {
                 value: container.hoveredTitle
                 when: container.hoveredTitle.length
+                restoreMode: Binding.RestoreBinding                
             }
         }
     }
@@ -692,13 +697,13 @@ Item {
             }
             for(var i=0, len = videoModel.count; i < len; i++) {
                 if(videoModel.get(i).id === currentVideo.vId && i != (len-1)) {
-                    webView.runJavaScript('cueVideo("' + videoModel.get(i + 1).id + '");');
                     currentVideo.vId = videoModel.get(i + 1).id;
                     currentVideo.title = videoModel.get(i + 1).title;
-                    webView.runJavaScript('nextVideo();');
                     if(videoModel.get(i + 1).type !== "youtube#video") {
                         videoModel.playNextVideo();
-                    }
+                    }                    
+                    webView.runJavaScript('cueVideo("' + videoModel.get(i + 1).id + '");');    
+                    webView.runJavaScript('nextVideo();');
                     break;
                     
                 }
@@ -724,12 +729,13 @@ Item {
                     if(clearModel) {
                         videoModel.clear();
                     }
+
                     for (var i = 0, len = doc.items.length; i < len; i++) {
                         var title = doc.items[i].snippet.title;
                         var thumbnail = (doc.items[i].snippet.thumbnails === undefined)?'./icons/not-found.png':doc.items[i].snippet.thumbnails.default.url;
                         var id;
                         var type;
-                        if (doc.items[i].kind === "youtube#searchResult" ) {
+                         if (doc.items[i].kind === "youtube#searchResult" ) {
                             type = doc.items[i].id.kind;
 
                             switch(type) {
@@ -752,7 +758,6 @@ Item {
                             type = doc.items[i].kind;
                             id = doc.items[i].id;
                         }
-                        
                         videoModel.append({ "title": title ,"thumbnail": thumbnail,"id": id,"type": type });
                     }	                
                 

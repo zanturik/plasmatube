@@ -66,7 +66,7 @@
 
         function nextVideo() {
           player.nextVideo();
-          if(params.autoplay == "false") {
+          if(params.autoplay) {
             player.playVideo();
           }
         }
