@@ -10,7 +10,7 @@ Rectangle {
     id: root
     clip: true
     property alias cfg_channels_list: channels_list.text
-    
+    color: theme.backgroundColor
     width: 300; 
 
     Content.DB {
@@ -44,9 +44,9 @@ Rectangle {
                 width: dragArea.width; height: column.implicitHeight + 4
 
                 border.width: 1
-                border.color: "lightsteelblue"
+                border.color: theme.alternateBackgroundColor
 
-                color: dragArea.held ? "lightsteelblue" : "white"
+                color: dragArea.held ? theme.alternateBackgroundColor : theme.backgroundColor
                 Behavior on color { ColorAnimation { duration: 100 } }
 
                 radius: 2
@@ -75,9 +75,20 @@ Rectangle {
                             QtLayouts.Layout.alignment: Qt.AlignLeft;
                             QtLayouts.Layout.leftMargin: 25
                             QtLayouts.Layout.fillWidth: true
-                            Text { text: i18n('Name:  ') + title }
-                            Text { text: i18n((type==="youtube#channel")?"Type: channel":"Type: playlist") }
-                            Text { text: i18n('Videos:  ') + totalcount }
+                            Text { 
+                                text: i18n('Name:  ') + title 
+                                color: theme.textColor
+                            }
+                            Text { 
+                                text: i18n((type==="youtube#channel")?"Type: channel":"Type: playlist") 
+                                color: theme.textColor
+                                
+                            }
+                            Text { 
+                                text: i18n('Videos:  ') + totalcount
+                                color: theme.textColor
+                                
+                            }
                             QtControls.ComboBox {
                                 width: 150
                                 activeFocusOnPress: true
@@ -120,6 +131,7 @@ Rectangle {
                 Rectangle {
                     width: 200
                     height: 25
+                    color: theme.backgroundColor
                     PlasmaCore.IconItem {
                         source: "go-home"
                         width: 25
@@ -129,6 +141,7 @@ Rectangle {
                     
                     Text {
                         anchors.left: parent.left
+                        color: theme.textColor
                         text: title
                     }
                 }

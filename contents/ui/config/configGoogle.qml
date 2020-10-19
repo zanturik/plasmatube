@@ -50,24 +50,12 @@ Item {
                 maximumLength: 64
                 readOnly: true
                 onFocusChanged: { if(activeFocus) { selectAll() }  } 
-                style: TextFieldStyle {
-                    textColor: "#111"
-                    background: Rectangle {
-                        color: "#eee"
-                    }
-		}
             }            
             QtControls.TextField {
                 id: userCodeInput
                 placeholderText: i18n("Please, wait...")
                 readOnly: true
                 onFocusChanged: { if(activeFocus) { selectAll() }  } 
-                style: TextFieldStyle {
-                    textColor: "#111"
-                    background: Rectangle {
-                        color: "#eee"
-                    }
-		}
             }
         }	   
         Column {
