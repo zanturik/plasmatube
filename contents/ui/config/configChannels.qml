@@ -24,7 +24,7 @@ Rectangle {
 
             property bool held: false
 
-            anchors { left: parent.left; right: parent.right }
+            anchors { left: parent ? parent.left: undefined ; right: parent ? parent.right : undefined }
             height: content.height
 
             drag.target: held ? content : undefined
@@ -44,9 +44,9 @@ Rectangle {
                 width: dragArea.width; height: column.implicitHeight + 4
 
                 border.width: 1
-                border.color: theme.alternateBackgroundColor
+                border.color: Qt.darker(theme.backgroundColor, 1.25)
 
-                color: dragArea.held ? theme.alternateBackgroundColor : theme.backgroundColor
+                color: dragArea.held ? Qt.darker(theme.backgroundColor, 1.25) : theme.backgroundColor
                 Behavior on color { ColorAnimation { duration: 100 } }
 
                 radius: 2
