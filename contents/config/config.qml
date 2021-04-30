@@ -19,10 +19,5 @@ ConfigModel {
          icon: "preferences-web-browser-shortcuts"
          source: "config/configChannels.qml"
     }  
-    ConfigCategory {
-         name: i18n("About")
-         icon: "preferences-desktop-notification"
-         source: "config/configAbout.qml"
-    }      
     
 }
