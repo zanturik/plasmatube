@@ -1,5 +1,5 @@
-import QtQuick 2.0
-import QtQuick.Controls 1.1 as QtControls
+import QtQuick 2.15
+import QtQuick.Controls 2.15 as QtControls
 import QtQuick.Controls.Styles 1.1
 import QtQuick.Layouts 1.0 as QtLayouts
 import org.kde.plasma.core 2.0 as PlasmaCore
@@ -24,7 +24,17 @@ Item {
     
          QtLayouts.ColumnLayout {
         Column {
-            visible: cfg_access_token
+            Text {
+                visible: false
+                id: client_credentials_error
+                color: theme.negativeTextColor
+                text: "Client credentials are invalid!"
+            }
+        }
+
+
+        Column {
+         visible: cfg_access_token
 	     QtControls.Label {
                 text: i18n("Connected! You may watch videos :)")
             }
@@ -38,8 +48,38 @@ Item {
             }
         }
         Column {
-            visible: !cfg_access_token
-	     QtControls.Label {
+
+            visible: true
+            QtLayouts.RowLayout {
+                QtLayouts.Layout.fillWidth: true
+                QtControls.Label {
+                    text: i18n("client_id:")
+                }
+                QtControls.TextField {
+                    id: client_id
+                    text: "Text"
+                    QtLayouts.Layout.fillWidth: true
+                    onTextEdited: { cfg_client_id = client_id.text.trim(); clearUserCode(); }
+                }
+                
+            }
+
+            QtLayouts.RowLayout {
+                QtControls.Label {
+                    text: i18n("client_secret:")
+                }
+                QtControls.TextField {
+                    id: client_secret
+                    QtLayouts.Layout.fillWidth: true
+                    onTextEdited: { cfg_client_secret = client_secret.text.trim(); clearUserCode(); }
+                }
+            }    
+        }
+
+        Column {
+            visible: !cfg_access_token && plasmoid.configuration.client_secret && plasmoid.configuration.client_secret === cfg_client_secret
+             && plasmoid.configuration.client_id == cfg_client_id && plasmoid.configuration.client_id && client_credentials_error.visible == false
+	        QtControls.Label {
                 text: i18n("Please, enter the following code at the:")
 		
             }
@@ -57,29 +97,11 @@ Item {
                 readOnly: true
                 onFocusChanged: { if(activeFocus) { selectAll() }  } 
             }
+            onVisibleChanged: { if(this.visible) { generateUserCodeAndPoll(); }}
         }	   
         Column {
             visible: false
-            QtLayouts.RowLayout {
-                QtLayouts.Layout.fillWidth: true
-                QtControls.Label {
-                    text: i18n("client_id:")
-                }
-                QtControls.TextField {
-                    id: client_id
-                    QtLayouts.Layout.fillWidth: true
-                }
-            }
 
-            QtLayouts.RowLayout {
-                QtControls.Label {
-                    text: i18n("client_secret:")
-                }
-                QtControls.TextField {
-                    id: client_secret
-                    QtLayouts.Layout.fillWidth: true
-                }
-            }
             
             QtLayouts.RowLayout {
                 QtLayouts.Layout.fillWidth: true
@@ -194,7 +216,7 @@ Item {
         onTriggered: pollAccessToken()
     }
     
-    function pollAccessToken() {
+    function pollAccessToken() {    
         var url = 'https://oauth2.googleapis.com/token';
         Ajax.post({
             url: url,
@@ -205,10 +227,9 @@ Item {
                 grant_type: 'http://oauth.net/grant_type/device/1.0',
             },
         }, function(err, data) {
-	
             data = JSON.parse(data);
-
             if (data.error) {
+                if(data.error != 'authorization_pending') { client_credentials_error.visible = true; }
                 return;
             }
 
@@ -235,8 +256,25 @@ Item {
         }, callback);
     }        
         
+
+    function clearUserCode() {
+        cfg_access_token = '';
+        cfg_access_token_expires_at = '';
+        cfg_access_token_type = '';
+        val_user_code = '';
+        val_user_code_expires_at = '';
+        val_user_code_interval = '';
+        val_user_code_verification_url = '';
+        accessTokenTimer.stop();
+        client_credentials_error.visible = false;
+    }    
+
     function generateUserCodeAndPoll() {
         getUserCode(function(err, data) {
+            if(err) {
+                client_credentials_error.visible = true;
+                return;
+            }
             data = JSON.parse(data);
             device_code.text = data.device_code;
             val_user_code = data.user_code;
@@ -255,7 +293,7 @@ Item {
     Component.onCompleted: {
         if (plasmoid.configuration.access_token) {
             //updateRecomendations();
-        } else {
+        } else if(plasmoid.configuration.client_secret && plasmoid.configuration.client_id) {
             generateUserCodeAndPoll();
         }
     }	

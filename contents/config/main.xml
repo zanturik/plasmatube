@@ -29,10 +29,10 @@
   </group>
   <group name="Youtube auth">
     <entry name="client_id" type="string">
-      <default>765338925203-93gd0chkjsicbmelerls6j9348qsquch.apps.googleusercontent.com</default>
+      <default></default>
     </entry>
     <entry name="client_secret" type="string">
-      <default>O4q_OS8Kxoi1UwwEXdqF33k_</default>
+      <default></default>
     </entry>
     <entry name="access_token" type="String">
         <default></default>

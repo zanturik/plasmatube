@@ -1,8 +1,9 @@
 
-import QtQuick 2.0
-import QtQml 2.14
+import QtQuick 2.15
+import QtQuick.Layouts 1.0
+import QtQml 2.15
 import QtWebEngine 1.5
-import QtQuick.Controls 1.1 as QtControls
+import QtQuick.Controls 2.15 as QtControls
 import QtQuick.Controls.Styles 1.1
 import org.kde.plasma.core 2.0 as PlasmaCore
 import org.kde.plasma.components 2.0 as PlasmaComponents
@@ -13,8 +14,8 @@ import org.kde.draganddrop 2.0 as DragDrop
 Item {
     id: container
     property string hoveredTitle
-    width: units.gridUnit * 16 * plasmoid.configuration.windowSize
-    height: units.gridUnit * 9 * plasmoid.configuration.windowSize
+    Layout.preferredWidth: units.gridUnit * 16 * plasmoid.configuration.windowSize
+    Layout.preferredHeight: units.gridUnit * 9 * plasmoid.configuration.windowSize
     clip: true;
 
 

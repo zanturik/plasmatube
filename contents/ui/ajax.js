@@ -15,9 +15,12 @@ function request(opt, callback) {
                 callback(null, req.responseText, req);
             } else {
                 if (req.status === 401) {
-                    updateAccessToken();
-                    return;
-                }
+                    var responseText = JSON.parse(req.responseText); 
+                    if(responseText.error != 'invalid_client') {
+                        updateAccessToken();
+                        return;
+                    }
+               }
                 var msg = "HTTP Error " + req.status + ": " + req.statusText;
                 callback(msg, req.responseText, req);
             }

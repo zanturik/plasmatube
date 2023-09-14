@@ -1,0 +1,24 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "zanturik@gmail.com",
+                "Name": "Hill"
+            }
+        ],
+        "Category": "Multimedia",
+        "Description": "Plasmoid for viewing youtube videos.",
+        "Icon": "video-television",
+        "Id": "org.kde.plasmatube",
+        "License": "LGPLv2",
+        "Name": "Plasmatube",
+        "ServiceTypes": [
+            "Plasma/Applet"
+        ],
+        "Version": "3.2.0",
+        "Website": "plasmatube.maka.tk"
+    },
+    "X-Plasma-API": "declarativeappletscript",
+    "X-Plasma-MainScript": "ui/main.qml",
+    "X-Plasma-StandAloneApp": true
+}
