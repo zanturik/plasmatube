@@ -3,7 +3,7 @@
         "Authors": [
             {
                 "Email": "zanturik@gmail.com",
-                "Name": "Hill"
+                "Name": "Iaroslav Sheveliuk"
             }
         ],
         "Category": "Multimedia",
@@ -20,5 +20,5 @@
     },
     "X-Plasma-API": "declarativeappletscript",
     "X-Plasma-MainScript": "ui/main.qml",
-    "X-Plasma-StandAloneApp": true
+    "KPackageStructure": "Plasma/Applet"
 }
