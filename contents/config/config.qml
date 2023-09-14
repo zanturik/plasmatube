@@ -7,13 +7,7 @@ ConfigModel {
          icon: "preferences-desktop-settings"
          source: "config/configSettings.qml"
     }
-    
-    ConfigCategory {
-         name: i18n("Google Account")
-         icon: "preferences-system-login"
-         source: "config/configGoogle.qml"
-    }    
-    
+  
     ConfigCategory {
          name: i18n("Youtube channels")
          icon: "preferences-web-browser-shortcuts"

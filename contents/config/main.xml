@@ -28,27 +28,9 @@
     </entry>    
   </group>
   <group name="Youtube auth">
-    <entry name="client_id" type="string">
-      <default></default>
+    <entry name="restricted" type="string">
+      <default>AIzaSyDjzV9J1J5mp5H4dE9Q8d3eqrSap8Vu9Qk</default>
     </entry>
-    <entry name="client_secret" type="string">
-      <default></default>
-    </entry>
-    <entry name="access_token" type="String">
-        <default></default>
-    </entry>
-    <entry name="access_token_type" type="String">
-        <default></default>
-    </entry>
-    <entry name="access_token_expires_at" type="String">
-        <default></default>
-    </entry>
-    <entry name="refresh_token" type="String">
-        <default></default>
-    </entry> 
-    <entry name="device_code" type="String">
-        <default></default>
-    </entry> 
   </group>
   <group name="Youtube channels">
     <entry name="channels_list" type="string">

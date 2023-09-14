@@ -34,7 +34,7 @@ Item {
     QtObject {
         id: currentVideo
         property string vId: ''
-        property string title: (plasmoid.configuration.access_token==='')?"You need to connect to your google account!":''
+        property string title: ''
         property int status: videoStatus.initial
     }
 
@@ -659,11 +659,11 @@ Item {
         property string nextPageToken: ""
         property string userName: ""
         property string playlistId: ""
-        
-        property string videoSource: plasmoid.configuration.baseUrl + "/videos?part=snippet&maxResults=" + plasmoid.configuration.numberOfVideos * 5 +"&access_token=" + plasmoid.configuration.access_token
-        property string searchSource:  plasmoid.configuration.baseUrl + "/search?part=snippet&maxResults=" + plasmoid.configuration.numberOfVideos * 5 +"&q=" + input.text + "&access_token=" + plasmoid.configuration.access_token
-        property string usersSource: plasmoid.configuration.baseUrl + "/search?part=snippet&order=date&type=video&maxResults=" + plasmoid.configuration.numberOfVideos * 5 +"&channelId="+ userName +"&access_token="  + plasmoid.configuration.access_token
-        property string playlistSource: plasmoid.configuration.baseUrl + "/playlistItems?part=snippet&maxResults=" + plasmoid.configuration.numberOfVideos * 5 +"&playlistId=" + playlistId + "&access_token="  + plasmoid.configuration.access_token
+        property string test: "AIzaSyDjzV9J1J5mp5H4dE9Q8d3eqrSap8Vu9Qk"
+        property string videoSource: plasmoid.configuration.baseUrl + "/videos?part=snippet&maxResults=" + plasmoid.configuration.numberOfVideos * 5 +"&key=" + plasmoid.configuration.restricted
+        property string searchSource:  plasmoid.configuration.baseUrl + "/search?part=snippet&maxResults=" + plasmoid.configuration.numberOfVideos * 5 +"&q=" + input.text + "&key=" + plasmoid.configuration.restricted
+        property string usersSource: plasmoid.configuration.baseUrl + "/search?part=snippet&order=date&type=video&maxResults=" + plasmoid.configuration.numberOfVideos * 5 +"&channelId="+ userName +"&key="  + plasmoid.configuration.restricted
+        property string playlistSource: plasmoid.configuration.baseUrl + "/playlistItems?part=snippet&maxResults=" + plasmoid.configuration.numberOfVideos * 5 +"&playlistId=" + playlistId + "&key="  + plasmoid.configuration.restricted
         property string source: searchSource
 
         function addVideo(videoId) {
@@ -716,7 +716,6 @@ Item {
         }
 
         function reload(clearModel) {
-            Ajax.checkIsTokenExpired();
             Ajax.request(source,function(err, data, xhr) {
                 if (err || (!err && data && data.error)) {
                     console.log('something went wrong:', err, data);
@@ -767,9 +766,6 @@ Item {
     }
     
     Component.onCompleted: {
-      if (plasmoid.configuration.access_token!=='') {
-       Ajax.checkIsTokenExpired();
-      }
       plasmoid.hideOnWindowDeactivate = !plasmoid.configuration.pinned;
       webView.url = "content/player.html?id=" + database.getRandomVideoId() + "&autoplay=" + plasmoid.configuration.autoplay
     }
