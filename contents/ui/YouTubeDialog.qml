@@ -1,8 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.3 as QtLayouts
 import QtQuick.Controls 2.15 as QtControls
-import org.kde.plasma.core 2.0 as PlasmaCore
-import org.kde.plasma.activityswitcher 1.0 as ActivitySwitcher
 import "ajax.js" as Ajax
 
 Rectangle {
@@ -10,6 +8,11 @@ Rectangle {
     signal presetClicked(string videoId, string type, string title)
     color: theme.backgroundColor
 
+
+    QtObject {
+        id: currentFolder
+        property string title: ''
+    }
 
     DB {
         id: database
@@ -32,14 +35,14 @@ Rectangle {
                     width: 200
                     icon.name: 'document-open-folder'
                     text: title
-                    onClicked: { refreshChannelsList(id); }
+                    onClicked: { refreshChannelsList(id, title); }
                 }
             }
             header: Component {
                 QtControls.Button {
                     id: homeFolderButton
                     icon.name: 'home'
-                    onClicked: { refreshChannelsList(null); }
+                    onClicked: { refreshChannelsList(null, null); }
                }   
             }            
             
@@ -72,7 +75,7 @@ Rectangle {
                                 newFolder.visible = false
                                 newFolderButton.visible = true
                                 newFolderInput.text = ''                                
-                                refreshChannelsList(null)
+                                refreshChannelsList(null, null)
                             }
                             
                             if(event.key === Qt.Key_Escape) {
@@ -110,14 +113,10 @@ Rectangle {
                     onClicked: presetClicked(videoId,type, title)
                 }
             }
-            
             header: Component {
-                PlasmaCore.IconItem {
-                    source: "face-wink"
-                    width: !channelModel.count ? parent.width : 0
-                    height: width
-                    visible: !channelModel.count
-                }                
+                QtControls.Label {
+                    text: currentFolder.title              
+                }              
             }             
         }
         
@@ -133,8 +132,9 @@ Rectangle {
     }
 
 
-    function refreshChannelsList(folderId) {
+    function refreshChannelsList(folderId, folderTitle) {
         channelModel.clear();
+        currentFolder.title = folderTitle;
         var videos = database.getVideos(folderId);
         for (var i = 0; i < videos.rows.length; i++) {
             channelModel.append({
@@ -159,7 +159,7 @@ Rectangle {
     }
     Component.onCompleted: {
       refreshFolders();
-      refreshChannelsList(null);
+      refreshChannelsList(null, null);
     }    
     
 }

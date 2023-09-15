@@ -5,7 +5,8 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 import org.kde.plasma.components 2.0 as PlasmaComponents
 import QtQml.Models 2.1
 import "../ajax.js" as Ajax
-import "../content" as Content
+import "../" // workaround to have DB
+
 Rectangle {
     id: root
     clip: true
@@ -13,7 +14,7 @@ Rectangle {
     color: theme.backgroundColor
     width: 300; 
 
-    Content.DB {
+    DB {
         id: database
     }
 
