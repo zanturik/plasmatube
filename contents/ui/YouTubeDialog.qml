@@ -3,7 +3,7 @@ import QtQuick.Layouts 1.3 as QtLayouts
 import QtQuick.Controls 2.15 as QtControls
 import org.kde.plasma.core 2.0 as PlasmaCore
 import org.kde.plasma.activityswitcher 1.0 as ActivitySwitcher
-import "./../ajax.js" as Ajax
+import "ajax.js" as Ajax
 
 Rectangle {
     id: container

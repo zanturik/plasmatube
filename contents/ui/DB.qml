@@ -158,7 +158,7 @@ Item {
 
     function getRandomVideoId() {
                 var videos;
-                var videoId = "fGZAQ6KEpMg";
+                var videoId = "5fzYJtuhueU";
                 root.db.transaction(
                     function(tx) {
                        videos = tx.executeSql('SELECT * FROM videos WHERE type = "youtube#video" ORDER BY RANDOM() LIMIT 1;');
