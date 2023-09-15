@@ -1,12 +1,11 @@
 
 import QtQuick 2.15
-import QtQuick.Layouts 1.0
+import QtQuick.Layouts 1.3
 import QtQml 2.15
 import QtWebEngine 1.5
 import QtQuick.Controls 2.15 as QtControls
 import QtQuick.Controls.Styles 1.1
 import org.kde.plasma.core 2.0 as PlasmaCore
-import org.kde.plasma.components 2.0 as PlasmaComponents
 import org.kde.plasma.plasmoid 2.0
 import "content" as Content
 import "ajax.js" as Ajax
@@ -299,7 +298,7 @@ Item {
                             }
                         }
                     }
-                    PlasmaComponents.Button {
+                    QtControls.Button {
                         id: addPresetButton
                         visible: false
                         height: 25
@@ -313,7 +312,7 @@ Item {
                         onClicked: database.addVideo(videoModel.get(index),null)
                         }	
             
-                    PlasmaComponents.Button {
+                    QtControls.Button {
                         id: removeButton
                         visible: false
                         height: 20
@@ -360,7 +359,7 @@ Item {
                     hideTimer.start()
             }
             
-            PlasmaComponents.Button {
+            QtControls.Button {
                 id: removeButton
                 visible: panel.visible && videoModel.count
                 height: 25
@@ -370,7 +369,7 @@ Item {
                 anchors.right: parent.right
                 width: height;
 			    opacity: 1                
-                iconSource: 'edit-delete'
+                icon.name: 'edit-delete'
                 onClicked: videoModel.clear()
             }            
 
@@ -438,7 +437,7 @@ Item {
             }
             
 
-            PlasmaComponents.Button {
+            QtControls.Button {
                 id: searchButton
                 anchors.left: searchField.right
                 anchors.verticalCenter: parent.verticalCenter
@@ -457,7 +456,7 @@ Item {
             
         }
 
-        PlasmaComponents.Button {
+        QtControls.Button {
             id: button
             height: 25
             width: container.width
@@ -578,15 +577,13 @@ Item {
         
     }
 
-    PlasmaComponents.ToolButton {
+    QtControls.ToolButton {
             id: pinButton
-            property real iconSize: units.iconSizes.small
-            property real padding: units.smallSpacing                 
+            padding: units.smallSpacing                 
             width: Math.round(units.gridUnit)
             height: width
             visible: panel.state != "hidden" 
-            iconSource: "window-pin"     
-            
+            icon.name: "window-pin"     
             checkable: true
             checked: !plasmoid.hideOnWindowDeactivate            
 

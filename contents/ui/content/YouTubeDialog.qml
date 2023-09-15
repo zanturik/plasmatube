@@ -1,7 +1,7 @@
-import QtQuick 2.7
+import QtQuick 2.15
 import QtQuick.Layouts 1.3 as QtLayouts
+import QtQuick.Controls 2.15 as QtControls
 import org.kde.plasma.core 2.0 as PlasmaCore
-import org.kde.plasma.components 2.0 as PlasmaComponents
 import org.kde.plasma.activityswitcher 1.0 as ActivitySwitcher
 import "./../ajax.js" as Ajax
 
@@ -28,17 +28,17 @@ Rectangle {
             model: folderModel
             boundsBehavior: Flickable.DragAndOvershootBounds         
             delegate:     Component {
-                PlasmaComponents.Button {
+                QtControls.Button {
                     width: 200
-                    iconSource: 'document-open-folder'
+                    icon.name: 'document-open-folder'
                     text: title
                     onClicked: { refreshChannelsList(id); }
                 }
             }
             header: Component {
-                PlasmaComponents.Button {
+                QtControls.Button {
                     id: homeFolderButton
-                    iconSource: 'go-home'
+                    icon.name: 'home'
                     onClicked: { refreshChannelsList(null); }
                }   
             }            
@@ -84,9 +84,9 @@ Rectangle {
                     }
 
                 }
-                PlasmaComponents.Button {
+                QtControls.Button {
                     id: newFolderButton
-                    iconSource: 'folder-new'
+                    icon.name: 'folder-new'
                     onClicked: {newFolder.visible = true;  newFolderInput.forceActiveFocus(); newFolderButton.visible = false; }
                }                
                 
@@ -103,7 +103,7 @@ Rectangle {
             model: channelModel
             boundsBehavior: Flickable.DragAndOvershootBounds         
             delegate:     Component {
-                PlasmaComponents.Button {
+                QtControls.Button {
                     width: 200
                     height: 25
                     text: title
