@@ -4,7 +4,6 @@ import QtQuick.Layouts 1.3
 import QtQml 2.15
 import QtWebEngine 1.5
 import QtQuick.Controls 2.15 as QtControls
-import org.kde.plasma.core 2.0 as PlasmaCore
 import org.kde.plasma.plasmoid 2.0
 import "ajax.js" as Ajax
 import org.kde.draganddrop 2.0 as DragDrop
