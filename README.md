@@ -1,4 +1,4 @@
 # Plasmatube
 Kde plasmoid to view youtube videos
-https://plasmatube.maka.tk
+https://www.opendesktop.org/p/1151366/
 
